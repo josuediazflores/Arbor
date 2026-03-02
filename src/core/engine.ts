@@ -181,7 +181,7 @@ export class DocGenEngineImpl {
 
   private computeStats(entries: DocEntry[], files: string[]): ScanStats {
     const byLanguage: Record<SupportedLanguage, number> = { c: 0, cpp: 0, kotlin: 0, swift: 0 };
-    const byKind: Record<string, number> = {};
+    const byKind: Record<string, number> = Object.create(null);
     let documentedCount = 0;
 
     for (const entry of entries) {

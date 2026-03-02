@@ -1,8 +1,10 @@
 import path from 'path';
 import ora from 'ora';
+import chalk from 'chalk';
 import type { SupportedLanguage } from '../../shared/types.js';
 import { loadConfig } from '../../shared/config.js';
 import { DocGenEngineImpl } from '../../core/engine.js';
+import { createSnapshot, saveSnapshot } from '../../core/snapshot.js';
 import { formatScanStats } from '../formatters.js';
 import { errorAndExit } from '../utils.js';
 
@@ -12,6 +14,7 @@ interface ScanOptions {
   exclude?: string[];
   json?: boolean;
   config?: string;
+  snapshot?: boolean | string;
 }
 
 export async function scanCommand(dir: string, options: ScanOptions): Promise<void> {
@@ -44,6 +47,17 @@ export async function scanCommand(dir: string, options: ScanOptions): Promise<vo
       console.log(JSON.stringify(result, null, 2));
     } else {
       console.log(formatScanStats(result.stats));
+    }
+
+    if (options.snapshot !== undefined) {
+      const snapshotPath = typeof options.snapshot === 'string'
+        ? path.resolve(options.snapshot)
+        : path.resolve('.arbor-snapshot.json');
+      const snapshot = createSnapshot(result, rootDir);
+      await saveSnapshot(snapshot, snapshotPath);
+      if (!options.json) {
+        console.log(chalk.green(`\nSnapshot saved to ${snapshotPath}`));
+      }
     }
   } catch (error) {
     errorAndExit((error as Error).message);

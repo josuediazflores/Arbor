@@ -71,6 +71,35 @@ export const DocEntrySchema = z.object({
   modifiers: z.array(z.string()).optional(),
 });
 
+export const SnapshotEntrySchema = z.object({
+  key: z.string(),
+  name: z.string(),
+  kind: DocEntryKindSchema,
+  language: SupportedLanguageSchema,
+  signature: z.string(),
+  documented: z.boolean(),
+  paramCount: z.number().int().nonnegative(),
+  visibility: VisibilitySchema.optional(),
+  parentName: z.string().optional(),
+});
+
+export const ScanStatsSchema = z.object({
+  totalFiles: z.number().int().nonnegative(),
+  totalEntries: z.number().int().nonnegative(),
+  byLanguage: z.record(z.number().int().nonnegative()),
+  byKind: z.record(z.number().int().nonnegative()),
+  documentedCount: z.number().int().nonnegative(),
+  undocumentedCount: z.number().int().nonnegative(),
+});
+
+export const SnapshotSchema = z.object({
+  version: z.literal(1),
+  createdAt: z.string(),
+  rootDir: z.string(),
+  entries: z.record(SnapshotEntrySchema),
+  stats: ScanStatsSchema,
+});
+
 export const DocGenConfigSchema = z.object({
   rootDir: z.string().default('.'),
   outputDir: z.string().default('./docs'),

@@ -112,3 +112,53 @@ export interface DocGenConfig {
   templateDir?: string;
   title?: string;
 }
+
+// --- Snapshot & Diff types ---
+
+export interface SnapshotEntry {
+  key: string;
+  name: string;
+  kind: DocEntryKind;
+  language: SupportedLanguage;
+  signature: string;
+  documented: boolean;
+  paramCount: number;
+  visibility?: Visibility;
+  parentName?: string;
+}
+
+export interface Snapshot {
+  version: 1;
+  createdAt: string;
+  rootDir: string;
+  entries: Record<string, SnapshotEntry>;
+  stats: ScanStats;
+}
+
+export type DiffChangeKind =
+  | 'added'
+  | 'removed'
+  | 'signature_changed'
+  | 'doc_added'
+  | 'doc_removed'
+  | 'params_changed'
+  | 'visibility_changed';
+
+export interface DiffChange {
+  kinds: DiffChangeKind[];
+  entry: SnapshotEntry;
+  previous?: SnapshotEntry;
+}
+
+export interface DiffResult {
+  added: DiffChange[];
+  removed: DiffChange[];
+  modified: DiffChange[];
+  summary: {
+    totalAdded: number;
+    totalRemoved: number;
+    totalModified: number;
+    coverageBefore: number;
+    coverageAfter: number;
+  };
+}
